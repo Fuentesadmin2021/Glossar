@@ -130,30 +130,27 @@ class Dlinked_list:
                 self.add_back(data_insert)
 
     def delete(self, value_to_del):
-      
-      if self.empty():
-        raise Exception("Cannot delete from empty linked list")
-        return False
-      #
+        if self.empty():
+            raise Exception("Cannot delete from empty linked list")
+            return False
 
-      node_to_del = self.find_node_from_value(value_to_del)
-      
-      # first node case
-      if node_to_del.prev is None:
-        self.head = node_to_del.next
 
-      # final node case
-      elif node_to_del.next is None:
-        self.tail = node_to_del.prev
+        node_to_del = self.find_node_from_value(value_to_del)
 
-      #Middle node case
-      #if (node_to_del.next is not None) and (node_to_del.prev is not None)
-      else:
-        node_to_del.prev.next = node_to_del.next
-        node_to_del.next.prev = node_to_del.prev      
-      #
-      
-      return True
+        # first node case
+        if node_to_del.prev is None:
+            self.head = node_to_del.next
+
+        # last node case
+        elif node_to_del.next is None:
+            self.tail = node_to_del.prev
+
+        # middle node case
+        # if (node_to_del.next is not None) and (node_to_del.prev is not None)
+        else:
+            node_to_del.prev.next = node_to_del.next
+            node_to_del.next.prev = node_to_del.prev      
+        return True
 
 # ----------------------------- glossar class --------------------------------
 
@@ -161,14 +158,14 @@ class Dlinked_list:
 
 class Glossar(Dlinked_list):
 
-    #Constructor to
+    # constructor to
     def __init__(self):
         Dlinked_list.__init__(self)
         self.head = None
         self.tail = None 
         self.length = 0
 
-    #Transform string "abc" to numeric representation "[1,2,3]"
+    # transform string "abc" to numeric representation "[1,2,3]"
     def transform_to_numeric_representation(self, palabra):
         alfabeto = {
         "A":1,"Á":1,"Ä":1,"a":1,"á":1,"ä":1,
@@ -204,60 +201,64 @@ class Glossar(Dlinked_list):
         for letra in palabra:
             numeric_representation.append(alfabeto[letra])
         return numeric_representation
-    ###
 
-    def insert_in_alhpabet_order(self,wordToAdd,list):
 
-        if isinstance(wordToAdd, str):
-            codedWord = self.transform_to_numeric_representation(wordToAdd)
-            ptr = list.head
+    def insert_in_alhpabet_order(self, word_to_add):
 
-        if list.length<=0 :
-            list.insertHead(Node(wordToAdd))
+        if isinstance(word_to_add, str):
+            coded_word = self.transform_to_numeric_representation(word_to_add)
+            pointer = self.head
+        else:
+            raise Exception("Error, The input is not a string")
 
-        elif list.length >= 1:
-            while ptr != None:
+        if self.empty():
+            self.add_back(word_to_add)
+
+        else:
+            while pointer:
                 try:
-                    arrPtr = self.transform_to_numeric_representation(ptr.data) 
-                    arrNext = self.transform_to_numeric_representation(ptr.next.data)
+                    coded_pointer = self.transform_to_numeric_representation(pointer.data) 
+                    coded_next_pointer = self.transform_to_numeric_representation(pointer.next.data)
 
-                    for i in range (0,codedWord.length):
+                    recorrido = []
+                    recorrido.append(len(coded_word))
+                    recorrido.append(len(coded_pointer))
+                    recorrido.append(len(coded_next_pointer))
+
+                    recorrido = min(recorrido)
+
+                    for i in range (0, recorrido):
 
                         #Look other words
-                        if arrPtr[i] < codedWord[i] and arrNext[i] < codedWord[i]:
+                        if coded_pointer[i] < coded_word[i] and coded_next_pointer[i] < coded_word[i]:
                             break
                         #Continue checking words
-                        if arrPtr[i] == codedWord[i] and arrNext[i] == codedWord[i]: 
+                        if coded_pointer[i] == coded_word[i] and coded_next_pointer[i] == coded_word[i]: 
                             continue 
                         #Continue checking words
-                        if arrPtr[i] <= codedWord[i] and arrNext[i] == codedWord[i]: 
+                        if coded_pointer[i] <= coded_word[i] and coded_next_pointer[i] == coded_word[i]: 
                             continue 
                         #Founded place
-                        if arrPtr[i] <= codedWord[i] and arrNext[i] > codedWord[i]:
+                        if coded_pointer[i] <= coded_word[i] and coded_next_pointer[i] > coded_word[i]:
                         
-                            newNode = Node(wordToAdd)
-                            newNode.next = ptr.next
-                            ptr.next.prev = newNode
-                            ptr.next = newNode
-                            newNode.prev = ptr
-                            if ptr is list.tail:
+                            newNode = Node(word_to_add)
+                            newNode.next = pointer.next
+                            pointer.next.prev = newNode
+                            pointer.next = newNode
+                            newNode.prev = pointer
+                            if pointer is list.tail:
                                 list.tail = newNode
 
-                    ptr = ptr.next
+                    pointer = pointer.next
             
                 except TypeError: 
-                    newNode = Node(wordToAdd)
+                    newNode = Node(word_to_add)
                     if list.head is None and list.tail is None:
                         list.tail = list.tail = newNode
                     else:
                         newNode.prev = list.tail
                         list.tail = newNode
                         newNode.prev.next = newNode
-    
-        else:
-            raise Exception("ERROR: dato ingresado no es un String")
-
-
 # ------------------------ prueba de funcionamiento -------------------------
 
 glosario = Glossar()
@@ -274,5 +275,6 @@ glosario.insert_after("mi", "querido")
 glosario.insert_after("eterno", "?")
 
 glosario.delete("hola")
+
 
 glosario.tra_head()
